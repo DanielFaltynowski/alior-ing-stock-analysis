@@ -14,6 +14,8 @@ This project addresses the challenge of understanding the behavior of Alior and 
 
 ### 🗂 Source
 
+The dataset used in this project consists of historical stock closing prices for Alior Bank and ING Bank Śląski. The data was obtained from Stooq, a reliable financial database, covering the period from January 1, 2023, to December 31, 2024. This data provides the basis for both univariate and bivariate analyses, enabling the exploration of distribution models, statistical relationships, and regression-based modeling.
+
 - [Alior Bank](https://stooq.pl/q/d/?s=alr&c=0&f=20230101&t=20241231)
 
 - [ING Bank Śląski](https://stooq.pl/q/d/?s=ing&c=0&f=20230101&t=20241231)

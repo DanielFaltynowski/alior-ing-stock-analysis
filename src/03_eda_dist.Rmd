@@ -1,0 +1,48 @@
+---
+title: "Chapter 3: Exploratory Data Analysis and Distribution Equality Tests"
+output: html_notebook
+---
+
+1. rusyję wykresy
+
+```{r}
+data <- read.csv("int_data.csv")
+```
+
+```{r}
+dates <- as.Date(data$date, format = "%Y-%m-%d")
+alior <- data$closes_alior
+ing <- data$closes_ing
+```
+
+```{r}
+plot(
+  x = dates,
+  y = alior,
+  type = "l"
+)
+```
+
+```{r}
+plot(
+  x = dates,
+  y = ing,
+  type = "l"
+)
+```
+
+```{r}
+hist(
+  x = alior,
+  freq = FALSE,
+  breaks = 30
+)
+```
+
+```{r}
+hist(
+  x = ing,
+  freq = FALSE,
+  breaks = 30
+)
+```

@@ -156,7 +156,11 @@ I save the interpolated data into a CSV file so that it can be used for further 
 
 ```{r}
 new_data <- data.frame(
-  date = data_dates,
+  date = seq.Date(
+    from = as.Date("2023-01-01"),
+    to = as.Date("2024-12-31"),
+    by = "day"
+  ),
   closes_alior = data_alior_int,
   closes_ing = data_ing_int
 )

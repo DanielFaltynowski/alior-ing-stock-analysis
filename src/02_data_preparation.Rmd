@@ -56,7 +56,9 @@ I use the `approx` function in R for linear interpolation.
 
 The `approx` function works as follows:
 
-- It takes a vector of known points (`x` and `y`).  
+- It takes a vector of known points:
+  - `x`: representing indexes of non-empty values,
+  - `y`: representing values at indexes at `x`.
 
 - It computes values at target points (`xout`) through **linear interpolation**, i.e., it determines a point on the line connecting two neighboring known points.  
 

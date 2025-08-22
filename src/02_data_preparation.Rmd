@@ -7,10 +7,10 @@ output: html_notebook
 
 Using **PowerQuery**, I imported the data from a CSV file. After analyzing the column descriptions, I confirmed that none of them contained errors or missing values. However, I quickly noticed that the dataset includes **missing days** — some dates are absent from the data. Interestingly, in both datasets (`alr_d`, `ing_d`), the missing days are exactly the same.
 
-![*Alior company data*](../screenshots/01_alr.png)  
+![*Alior Bank company data*](../screenshots/01_alr.png)  
 
 
-![*Dane spółki ING*](../screenshots/02_ing.png)
+![*ING Bank company data*](../screenshots/02_ing.png)
 
 ## Missing Data Analysis
 
@@ -32,6 +32,52 @@ The table with the required data was saved to a CSV file. Then, in **VSCode**, I
 
 The next step is to perform **linear interpolation** of the missing data.  
 
+### Definition of Linear Interpolation
+
+Linear interpolation is a method to estimate missing values by assuming a linear change between two known points.  
+
+Mathematically, if a value \(y\) at position \(x\) is missing between two known points \((x_0, y_0)\) and \((x_1, y_1)\), it is computed as:
+
+\[
+y = y_0 + \frac{y_1 - y_0}{x_1 - x_0} \cdot (x - x_0)
+\]
+
+#### Example
+
+Consider the dataset:
+
+\[
+x = (3, 7, \text{NA}, 5, 8, \text{NA}, \text{NA}, 11)
+\]
+
+1. The first missing value (`NA`) is between 7 (position 2) and 5 (position 4). Using the formula:
+
+\[
+y = 7 + \frac{5 - 7}{4 - 2} \cdot (3 - 2) = 7 + (-1) = 6
+\]
+
+2. The second missing value (`NA`) is between 8 (position 5) and 11 (position 8). Since there are **two consecutive NAs**, we interpolate them linearly:
+
+- Position 6: 
+
+\[
+y = 8 + \frac{11 - 8}{8 - 5} \cdot (6 - 5) = 8 + 1 = 9
+\]
+
+- Position 7: 
+
+\[
+y = 8 + \frac{11 - 8}{8 - 5} \cdot (7 - 5) = 8 + 2 = 10
+\]
+
+After linear interpolation, the completed dataset becomes:
+
+\[
+x = (3, 7, 6, 5, 8, 9, 10, 11)
+\]
+
+### Loading Data
+
 I load the data into R and split it into the appropriate columns:
 
 ```{r}
@@ -51,6 +97,8 @@ data_dates <- data$date
 data_alior <- data$close_alr
 data_ing <- data$close_ing
 ```
+
+### Using Build-In Functions
 
 I use the `approx` function in R for linear interpolation.
 
@@ -123,6 +171,8 @@ write.csv(
 ```{r}
 new_data
 ```
+
+## Summary
 
 Thanks to this step, the dataset is now complete, and the missing values have been filled using linear interpolation.  
 This ensures that the data is ready for further analysis of the closing price distributions.

@@ -1,0 +1,126 @@
+---
+title: "Chapter 2: Data Preparation"
+output: html_notebook
+---
+
+## Data Loading
+
+Using **PowerQuery**, I imported the data from a CSV file. After analyzing the column descriptions, I confirmed that none of them contained errors or missing values. However, I quickly noticed that the dataset includes **missing days** — some dates are absent from the data. Interestingly, in both datasets (`alr_d`, `ing_d`), the missing days are exactly the same.
+
+![*Alior company data*](../screenshots/01_alr.png)  
+
+
+![*Dane spółki ING*](../screenshots/02_ing.png)
+
+## Missing Data Analysis
+
+I checked what percentage of the entire dataset is made up of missing days. If it were less than 5%, they could have been omitted. However, in our case, the missing data accounts for as much as **32%**, so ignoring them could distort the entire distribution analysis.
+
+![*Generated set of all dates in the analyzed period*](../screenshots/04_imported_dates.png)  
+
+
+![*Final dataset in Excel*](../screenshots/05_ready_data_excel.png)
+
+## Data Preparation
+
+The table with the required data was saved to a CSV file. Then, in **VSCode**, I replaced commas `,` with dots `.` (`06_change_comma_to_dot`), because Excel in my region saves numbers with a comma as the decimal separator.  
+
+![*Separator replacement*](../screenshots/06_change_comma_to_dot.png)
+
+
+## Linear Interpolation of Missing Values
+
+The next step is to perform **linear interpolation** of the missing data.  
+
+I load the data into R and split it into the appropriate columns:
+
+```{r}
+data <- read.csv(
+  file = "data.csv",
+  header = TRUE,
+  sep = ";"
+)
+```
+
+```{r}
+data
+```
+
+```{r}
+data_dates <- data$date
+data_alior <- data$close_alr
+data_ing <- data$close_ing
+```
+
+I use the `approx` function in R for linear interpolation.
+
+The `approx` function works as follows:
+
+- It takes a vector of known points (`x` and `y`).  
+
+- It computes values at target points (`xout`) through **linear interpolation**, i.e., it determines a point on the line connecting two neighboring known points.  
+
+- The parameter `rule = 2` ensures that values outside the range of known points are **extrapolated** instead of returning NA.  
+
+Below is my custom function that fills in the missing values:
+
+
+```{r}
+linear_interpolation <- function(data) {
+  na_indexes <- c()
+  no_na_indexes <- c()
+  no_na_values <- c()
+  for (i in 1:length(data)) {
+    if (is.na(data[i])) {
+      na_indexes <- c(na_indexes, i)
+    } else {
+      no_na_indexes <- c(no_na_indexes, i)
+      no_na_values <- c(no_na_values, data[i])
+    }
+  }
+  
+  interpolated_data <- approx(
+    x = no_na_indexes,
+    y = no_na_values,
+    xout = na_indexes,
+    rule = 2
+  )
+  
+  response <- data
+  response[na_indexes] <- interpolated_data$y
+  
+  return(response)
+}
+```
+
+I perform the interpolation separately for each column:
+
+```{r}
+data_alior_int <- linear_interpolation(data_alior)
+data_ing_int <- linear_interpolation(data_ing)
+```
+
+### Saving the interpolated data
+
+I save the interpolated data into a CSV file so that it can be used for further analysis:
+
+```{r}
+new_data <- data.frame(
+  date = data_dates,
+  closes_alior = data_alior_int,
+  closes_ing = data_ing_int
+)
+
+write.csv(
+  x = new_data,
+  file = "int_data.csv",
+  row.names = FALSE
+)
+```
+
+```{r}
+new_data
+```
+
+Thanks to this step, the dataset is now complete, and the missing values have been filled using linear interpolation.  
+This ensures that the data is ready for further analysis of the closing price distributions.

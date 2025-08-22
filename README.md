@@ -21,3 +21,5 @@ The dataset used in this project consists of historical stock closing prices for
 - [ING Bank Śląski](https://stooq.pl/q/d/?s=ing&c=0&f=20230101&t=20241231)
 
 # 📑 Report
+
+### Data Processing

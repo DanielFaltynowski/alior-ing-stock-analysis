@@ -23,7 +23,7 @@ I checked what percentage of the entire dataset is made up of missing days. If i
 
 ## Data Preparation
 
-The table with the required data was saved to a CSV file. Then, in **VSCode**, I replaced commas `,` with dots `.` (`06_change_comma_to_dot`), because Excel in my region saves numbers with a comma as the decimal separator.  
+The table with the required data was saved to a CSV file. Then, in **VSCode**, I replaced commas `,` with dots `.`, because Excel in my region saves numbers with a comma as the decimal separator.  
 
 ![*Separator replacement*](../screenshots/06_change_comma_to_dot.png)
 

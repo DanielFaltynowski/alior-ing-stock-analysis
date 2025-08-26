@@ -11,7 +11,7 @@
 
 
 
-<title>Chapter 1: Introduction</title>
+<title>Chapter 4: Distribution Fitting</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,18 +1746,217 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Chapter 1: Introduction</h1>
+<h1 class="title toc-ignore">Chapter 4: Distribution Fitting</h1>
 
 </div>
 
 
 <!-- rnb-text-begin -->
-<div id="section" class="section level3">
-<h3></h3>
 <!-- rnb-text-end -->
-</div>
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVaR0YwWVNBOExTQnlaV0ZrTG1OemRpaGNJaTR1TDJsdWRGOWtZWFJoTG1OemRsd2lLVnh1WUdCZ0luMD0gLS0+XG5cbmBgYHJcbmRhdGEgPC0gcmVhZC5jc3YoXCIuLi9pbnRfZGF0YS5jc3ZcIilcbmBgYFxuXG48IS0tIHJuYi1zb3VyY2UtZW5kIC0tPlxuIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YSA8LSByZWFkLmNzdihcIi4uL2ludF9kYXRhLmNzdlwiKVxuYGBgIn0= -->
+<pre class="r"><code>data &lt;- read.csv(&quot;../int_data.csv&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVaR0YwWlhNZ1BDMGdZWE11UkdGMFpTaGtZWFJoSkdSaGRHVXNJR1p2Y20xaGRDQTlJRndpSlZrdEpXMHRKV1JjSWlsY2JtRnNhVzl5SUR3dElHUmhkR0VrWTJ4dmMyVnpYMkZzYVc5eVhHNXBibWNnUEMwZ1pHRjBZU1JqYkc5elpYTmZhVzVuWEc1Z1lHQWlmUT09IC0tPlxuXG5gYGByXG5kYXRlcyA8LSBhcy5EYXRlKGRhdGEkZGF0ZSwgZm9ybWF0ID0gXCIlWS0lbS0lZFwiKVxuYWxpb3IgPC0gZGF0YSRjbG9zZXNfYWxpb3JcbmluZyA8LSBkYXRhJGNsb3Nlc19pbmdcbmBgYFxuXG48IS0tIHJuYi1zb3VyY2UtZW5kIC0tPlxuIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0ZXMgPC0gYXMuRGF0ZShkYXRhJGRhdGUsIGZvcm1hdCA9IFwiJVktJW0tJWRcIilcbmFsaW9yIDwtIGRhdGEkY2xvc2VzX2FsaW9yXG5pbmcgPC0gZGF0YSRjbG9zZXNfaW5nXG5gYGAifQ== -->
+<pre class="r"><code>dates &lt;- as.Date(data$date, format = &quot;%Y-%m-%d&quot;)
+alior &lt;- data$closes_alior
+ing &lt;- data$closes_ing</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>DOPASOWANIE ROZKŁADU</p>
+<p>log-normal gamma weibull</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVJeUJwYm5OMFlXeHNMbkJoWTJ0aFoyVnpLRndpWm1sMFpHbHpkSEp3YkhWelhDSXBYRzVzYVdKeVlYSjVLR1pwZEdScGMzUnljR3gxY3lsY2JtQmdZQ0o5IC0tPlxuXG5gYGByXG4jIGluc3RhbGwucGFja2FnZXMoXCJmaXRkaXN0cnBsdXNcIilcbmxpYnJhcnkoZml0ZGlzdHJwbHVzKVxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBpbnN0YWxsLnBhY2thZ2VzKFwiZml0ZGlzdHJwbHVzXCIpXG5saWJyYXJ5KGZpdGRpc3RycGx1cylcbmBgYCJ9 -->
+<pre class="r"><code># install.packages(&quot;fitdistrplus&quot;)
+library(fitdistrplus)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVZV3hwYjNKZmNtVjJJRHd0SUMxaGJHbHZjaUFySUdGaWN5aHRhVzRvTFdGc2FXOXlLU2tnS3lBd0xqQXdNVnh1WEc1aGJHbHZjbDltYVhSZmJHNXZjbTFmY21WMklEd3RJR1pwZEdScGMzUW9ZV3hwYjNKZmNtVjJMQ0JjSW14dWIzSnRYQ0lwWEc1emRXMXRZWEo1S0dGc2FXOXlYMlpwZEY5c2JtOXliVjl5WlhZcFhHNWdZR0FpZlE9PSAtLT5cblxuYGBgclxuYWxpb3JfcmV2IDwtIC1hbGlvciArIGFicyhtaW4oLWFsaW9yKSkgKyAwLjAwMVxuXG5hbGlvcl9maXRfbG5vcm1fcmV2IDwtIGZpdGRpc3QoYWxpb3JfcmV2LCBcImxub3JtXCIpXG5zdW1tYXJ5KGFsaW9yX2ZpdF9sbm9ybV9yZXYpXG5gYGBcblxuPCEtLSBybmItc291cmNlLWVuZCAtLT5cbiJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxpb3JfcmV2IDwtIC1hbGlvciArIGFicyhtaW4oLWFsaW9yKSkgKyAwLjAwMVxuXG5hbGlvcl9maXRfbG5vcm1fcmV2IDwtIGZpdGRpc3QoYWxpb3JfcmV2LCBcImxub3JtXCIpXG5zdW1tYXJ5KGFsaW9yX2ZpdF9sbm9ybV9yZXYpXG5gYGAifQ== -->
+<pre class="r"><code>alior_rev &lt;- -alior + abs(min(-alior)) + 0.001
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2hhcHRlciAxOiBJbnRyb2R1Y3Rpb24iCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KCiMjIyA=</div>
+alior_fit_lnorm_rev &lt;- fitdist(alior_rev, &quot;lnorm&quot;)
+summary(alior_fit_lnorm_rev)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRml0dGluZyBvZiB0aGUgZGlzdHJpYnV0aW9uICcgbG5vcm0gJyBieSBtYXhpbXVtIGxpa2VsaWhvb2QgXG5QYXJhbWV0ZXJzIDogXG4ifQ== -->
+<pre><code>Fitting of the distribution &#39; lnorm &#39; by maximum likelihood 
+Parameters : </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1mcmFtZS1iZWdpbiBleUp0WlhSaFpHRjBZU0k2ZXlKamJHRnpjMlZ6SWpwYkltUmhkR0V1Wm5KaGJXVWlYU3dpYm5KdmR5STZNaXdpYm1OdmJDSTZNaXdpYzNWdGJXRnllU0k2VzExOUxDSnlaR1lpT2lKSU5ITkpRVUZCUVVGQlFVRkJkM1I1YVZSRWJXbDFRbWxaUjBKbldtMUNhRUphU2tGNlRVUkJSMmh5YVhCdGRrSjNUVVJEUWs5UmQwMXlRWGRqU1V4dlEzRkRNRTFLUVVKRmRWRkVNRkUzYzNScWN6SjJSSFJpV2xBNVVqZHFNbUoyVGsxcmJVeHFPVVYxWTNGU1ZVaGlkUzlhZWxadGFTOVVaVXhOVWxSUFNVNVRPSGhPTjFWWmVVSkJRVWQzV1ZJMVJXZDBUSE51VFZSVGVFcG9aa3MxWjJ0MFV6bENVbU5wTkhKNWFUbERNR040WW14c0szUm9UVFJKT1U1NlZYaE1lV012U0ZkYVRtTlJjVWxuTWxvelkyczFhVTFWZDJwVVNrRnlTbUpGYTFWVEszUkRSMmR0YTFCalVGUlJkRGRtYTBaS1dtNDBaVlZDVFZSNVVHUnpZVXB2V21rNVFVVXJSWFo2VVVzMVREQlZNMDlMVFROTU1XcFdRbXN5V1hWNVJYTklNbEZyVjJkdFFtVkxUVEpGZVdkaE5XZDFheTlXUkhOaVZrUjBZbUZzTlRaYWFEUnpiRVpvZWtWd1RsTmpNa0Z0Y0RaVFYxRmFiRGgzUkVGRFFqVkdaVkZXUm0xWVoyNU5iakJFVWxseU1sTXZTa3BGYlVKaGRUVlFkMk50UVdwWk5YZDZMMEZEYnpCVk4wRlRRV2RCUVNKOSAtLT5cblxuPGRpdiBkYXRhLXBhZ2VkdGFibGU9XCJmYWxzZVwiPlxuICA8c2NyaXB0IGRhdGEtcGFnZWR0YWJsZS1zb3VyY2UgdHlwZT1cImFwcGxpY2F0aW9uL2pzb25cIj5cbntcImNvbHVtbnNcIjpbe1wibGFiZWxcIjpbXCJcIl0sXCJuYW1lXCI6W1wiX3JuX1wiXSxcInR5cGVcIjpbXCJcIl0sXCJhbGlnblwiOltcImxlZnRcIl19LHtcImxhYmVsXCI6W1wiZXN0aW1hdGVcIl0sXCJuYW1lXCI6WzFdLFwidHlwZVwiOltcImRibFwiXSxcImFsaWduXCI6W1wicmlnaHRcIl19LHtcImxhYmVsXCI6W1wiU3RkLiBFcnJvclwiXSxcIm5hbWVcIjpbMl0sXCJ0eXBlXCI6W1wiZGJsXCJdLFwiYWxpZ25cIjpbXCJyaWdodFwiXX1dLFwiZGF0YVwiOlt7XCIxXCI6XCIyLjkwNTEzN1wiLFwiMlwiOlwiMC4wMzk1NzczMVwiLFwiX3JuX1wiOlwibWVhbmxvZ1wifSx7XCIxXCI6XCIxLjA3MDA1MlwiLFwiMlwiOlwiMC4wMjc5ODUyN1wiLFwiX3JuX1wiOlwic2Rsb2dcIn1dLFwib3B0aW9uc1wiOntcImNvbHVtbnNcIjp7XCJtaW5cIjp7fSxcIm1heFwiOlsxMF0sXCJ0b3RhbFwiOlsyXX0sXCJyb3dzXCI6e1wibWluXCI6WzEwXSxcIm1heFwiOlsxMF0sXCJ0b3RhbFwiOlsyXX0sXCJwYWdlc1wiOnt9fX1cbiAgPFwvc2NyaXB0PlxuPFwvZGl2PlxuXG48IS0tIHJuYi1mcmFtZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MiwibmNvbCI6Miwic3VtbWFyeSI6W119LCJyZGYiOiJINHNJQUFBQUFBQUFBd3R5aVREbWl1QmlZR0JnWm1CaEJaSkF6TURBR2hyaXBtdkJ3TURDQk9Rd01yQXdjSUxvQ3FDME1KQUJFdVFEMFE3c3RqczJ2RHRiWlA5UjdqMmJ2Tk1rbUxqOUV1Y3FSVUhidS9aelZtaS9UZUxNUlRPSU5TOHhON1VZeUJBQUd3WVI1RWd0THNuTVRTeEpoZks1Z2t0UzlCUmNpNHJ5aTlDMGN4YmxsK3RoTTRJOU56VXhMeWMvSFdaTmNRcUlnMlozY2s1aU1Vd2pUSkFySmJFa1VTK3RDR2dta1BjUFRRdDdma0ZKWm40ZVVCTVR5UGRzYUpvWmk5QUUrRXZ6UUs1TDBVM09LTTNMMWpWQmsyWXV5RXNIMlFrV2dtQmVLTTJFeWdhNWd1ay9WRHNiVkR0YmFsNTZaaDRzbEZoekVwTlNjMkFtcDZTV1FabDh3REFDQjVGZVFWRm1YZ25NbjBEUllyMlMvSkpFbUJhdTVQd2NtQWpZNXd6L0FDbzBVN0FTQWdBQSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["estimate"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Std. Error"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"2.905137","2":"0.03957731","_rn_":"meanlog"},{"1":"1.070052","2":"0.02798527","_rn_":"sdlog"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9nbGlrZWxpaG9vZDogIC0zMjEwLjM5NCAgIEFJQzogIDY0MjQuNzg3ICAgQklDOiAgNjQzMy45NzYgXG5Db3JyZWxhdGlvbiBtYXRyaXg6XG4gICAgICAgIG1lYW5sb2cgc2Rsb2dcbm1lYW5sb2cgICAgICAgMSAgICAgMFxuc2Rsb2cgICAgICAgICAwICAgICAxXG4ifQ== -->
+<pre><code>Loglikelihood:  -3210.394   AIC:  6424.787   BIC:  6433.976 
+Correlation matrix:
+        meanlog sdlog
+meanlog       1     0
+sdlog         0     1</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVjR1JtWDJGc2FXOXlYMnh1YjNKdElEd3RJR1oxYm1OMGFXOXVLSGdwSUh0Y2JpQWdaR3h1YjNKdEtGeHVJQ0FnSUhnZ1BTQmhZbk1vYldsdUtDMWhiR2x2Y2lrcElDc2dNQzR3TURFZ0xTQjRMRnh1SUNBZ0lHMWxZVzVzYjJjZ1BTQmhiR2x2Y2w5bWFYUmZiRzV2Y20xZmNtVjJKR1Z6ZEdsdFlYUmxXMXdpYldWaGJteHZaMXdpWFN4Y2JpQWdJQ0J6Wkd4dlp5QTlJR0ZzYVc5eVgyWnBkRjlzYm05eWJWOXlaWFlrWlhOMGFXMWhkR1ZiWENKelpHeHZaMXdpWFZ4dUlDQXBYRzU5WEc1Z1lHQWlmUT09IC0tPlxuXG5gYGByXG5wZGZfYWxpb3JfbG5vcm0gPC0gZnVuY3Rpb24oeCkge1xuICBkbG5vcm0oXG4gICAgeCA9IGFicyhtaW4oLWFsaW9yKSkgKyAwLjAwMSAtIHgsXG4gICAgbWVhbmxvZyA9IGFsaW9yX2ZpdF9sbm9ybV9yZXYkZXN0aW1hdGVbXCJtZWFubG9nXCJdLFxuICAgIHNkbG9nID0gYWxpb3JfZml0X2xub3JtX3JldiRlc3RpbWF0ZVtcInNkbG9nXCJdXG4gIClcbn1cbmBgYFxuXG48IS0tIHJuYi1zb3VyY2UtZW5kIC0tPlxuIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGRmX2FsaW9yX2xub3JtIDwtIGZ1bmN0aW9uKHgpIHtcbiAgZGxub3JtKFxuICAgIHggPSBhYnMobWluKC1hbGlvcikpICsgMC4wMDEgLSB4LFxuICAgIG1lYW5sb2cgPSBhbGlvcl9maXRfbG5vcm1fcmV2JGVzdGltYXRlW1wibWVhbmxvZ1wiXSxcbiAgICBzZGxvZyA9IGFsaW9yX2ZpdF9sbm9ybV9yZXYkZXN0aW1hdGVbXCJzZGxvZ1wiXVxuICApXG59XG5gYGAifQ== -->
+<pre class="r"><code>pdf_alior_lnorm &lt;- function(x) {
+  dlnorm(
+    x = abs(min(-alior)) + 0.001 - x,
+    meanlog = alior_fit_lnorm_rev$estimate[&quot;meanlog&quot;],
+    sdlog = alior_fit_lnorm_rev$estimate[&quot;sdlog&quot;]
+  )
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVlQ0E4TFNCelpYRW9YRzRnSUdaeWIyMGdQU0J0YVc0b1lXeHBiM0lwTEZ4dUlDQjBieUE5SUcxaGVDaGhiR2x2Y2lrc1hHNGdJR3hsYm1kMGFDNXZkWFFnUFNBeE1EQXdYRzRwWEc1Y2JtaHBjM1FvWEc0Z0lIZ2dQU0JoYkdsdmNpeGNiaUFnWm5KbGNTQTlJRVpCVEZORlhHNHBYRzVjYm14cGJtVnpLRnh1SUNCNElEMGdlQ3hjYmlBZ2VTQTlJSEJrWmw5aGJHbHZjbDlzYm05eWJTaDRLU3hjYmlBZ1kyOXNJRDBnWENKeVpXUmNJaXhjYmlBZ2JIZGtJRDBnTWx4dUtWeHVZR0JnSW4wPSAtLT5cblxuYGBgclxueCA8LSBzZXEoXG4gIGZyb20gPSBtaW4oYWxpb3IpLFxuICB0byA9IG1heChhbGlvciksXG4gIGxlbmd0aC5vdXQgPSAxMDAwXG4pXG5cbmhpc3QoXG4gIHggPSBhbGlvcixcbiAgZnJlcSA9IEZBTFNFXG4pXG5cbmxpbmVzKFxuICB4ID0geCxcbiAgeSA9IHBkZl9hbGlvcl9sbm9ybSh4KSxcbiAgY29sID0gXCJyZWRcIixcbiAgbHdkID0gMlxuKVxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSBzZXEoXG4gIGZyb20gPSBtaW4oYWxpb3IpLFxuICB0byA9IG1heChhbGlvciksXG4gIGxlbmd0aC5vdXQgPSAxMDAwXG4pXG5cbmhpc3QoXG4gIHggPSBhbGlvcixcbiAgZnJlcSA9IEZBTFNFXG4pXG5cbmxpbmVzKFxuICB4ID0geCxcbiAgeSA9IHBkZl9hbGlvcl9sbm9ybSh4KSxcbiAgY29sID0gXCJyZWRcIixcbiAgbHdkID0gMlxuKVxuYGBgIn0= -->
+<pre class="r"><code>x &lt;- seq(
+  from = min(alior),
+  to = max(alior),
+  length.out = 1000
+)
+
+hist(
+  x = alior,
+  freq = FALSE
+)
+
+lines(
+  x = x,
+  y = pdf_alior_lnorm(x),
+  col = &quot;red&quot;,
+  lwd = 2
+)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVZV3hwYjNKZlptbDBYMmRoYlcxaFgzSmxkaUE4TFNCbWFYUmthWE4wS0dGc2FXOXlYM0psZGl3Z1hDSm5ZVzF0WVZ3aUtWeHVjM1Z0YldGeWVTaGhiR2x2Y2w5bWFYUmZaMkZ0YldGZmNtVjJLVnh1WUdCZ0luMD0gLS0+XG5cbmBgYHJcbmFsaW9yX2ZpdF9nYW1tYV9yZXYgPC0gZml0ZGlzdChhbGlvcl9yZXYsIFwiZ2FtbWFcIilcbnN1bW1hcnkoYWxpb3JfZml0X2dhbW1hX3JldilcbmBgYFxuXG48IS0tIHJuYi1zb3VyY2UtZW5kIC0tPlxuIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxpb3JfZml0X2dhbW1hX3JldiA8LSBmaXRkaXN0KGFsaW9yX3JldiwgXCJnYW1tYVwiKVxuc3VtbWFyeShhbGlvcl9maXRfZ2FtbWFfcmV2KVxuYGBgIn0= -->
+<pre class="r"><code>alior_fit_gamma_rev &lt;- fitdist(alior_rev, &quot;gamma&quot;)
+summary(alior_fit_gamma_rev)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVjR1JtWDJGc2FXOXlYMmRoYlcxaElEd3RJR1oxYm1OMGFXOXVLSGdwSUh0Y2JpQWdaR2RoYlcxaEtGeHVJQ0FnSUhnZ1BTQmhZbk1vYldsdUtDMWhiR2x2Y2lrcElDc2dNQzR3TURFZ0xTQjRMRnh1SUNBZ0lITm9ZWEJsSUQwZ1lXeHBiM0pmWm1sMFgyZGhiVzFoWDNKbGRpUmxjM1JwYldGMFpWdGNJbk5vWVhCbFhDSmRMRnh1SUNBZ0lISmhkR1VnSUQwZ1lXeHBiM0pmWm1sMFgyZGhiVzFoWDNKbGRpUmxjM1JwYldGMFpWdGNJbkpoZEdWY0lsMWNiaUFnS1Z4dWZWeHVZR0JnSW4wPSAtLT5cblxuYGBgclxucGRmX2FsaW9yX2dhbW1hIDwtIGZ1bmN0aW9uKHgpIHtcbiAgZGdhbW1hKFxuICAgIHggPSBhYnMobWluKC1hbGlvcikpICsgMC4wMDEgLSB4LFxuICAgIHNoYXBlID0gYWxpb3JfZml0X2dhbW1hX3JldiRlc3RpbWF0ZVtcInNoYXBlXCJdLFxuICAgIHJhdGUgID0gYWxpb3JfZml0X2dhbW1hX3JldiRlc3RpbWF0ZVtcInJhdGVcIl1cbiAgKVxufVxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGRmX2FsaW9yX2dhbW1hIDwtIGZ1bmN0aW9uKHgpIHtcbiAgZGdhbW1hKFxuICAgIHggPSBhYnMobWluKC1hbGlvcikpICsgMC4wMDEgLSB4LFxuICAgIHNoYXBlID0gYWxpb3JfZml0X2dhbW1hX3JldiRlc3RpbWF0ZVtcInNoYXBlXCJdLFxuICAgIHJhdGUgID0gYWxpb3JfZml0X2dhbW1hX3JldiRlc3RpbWF0ZVtcInJhdGVcIl1cbiAgKVxufVxuYGBgIn0= -->
+<pre class="r"><code>pdf_alior_gamma &lt;- function(x) {
+  dgamma(
+    x = abs(min(-alior)) + 0.001 - x,
+    shape = alior_fit_gamma_rev$estimate[&quot;shape&quot;],
+    rate  = alior_fit_gamma_rev$estimate[&quot;rate&quot;]
+  )
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVlQ0E4TFNCelpYRW9YRzRnSUdaeWIyMGdQU0J0YVc0b1lXeHBiM0lwTEZ4dUlDQjBieUE5SUcxaGVDaGhiR2x2Y2lrc1hHNGdJR3hsYm1kMGFDNXZkWFFnUFNBeE1EQXdYRzRwWEc1Y2JtaHBjM1FvWEc0Z0lIZ2dQU0JoYkdsdmNpeGNiaUFnWm5KbGNTQTlJRVpCVEZORlhHNHBYRzVjYm14cGJtVnpLRnh1SUNCNElEMGdlQ3hjYmlBZ2VTQTlJSEJrWmw5aGJHbHZjbDluWVcxdFlTaDRLU3hjYmlBZ1kyOXNJRDBnWENKaWJIVmxYQ0lzWEc0Z0lHeDNaQ0E5SURKY2JpbGNibUJnWUNKOSAtLT5cblxuYGBgclxueCA8LSBzZXEoXG4gIGZyb20gPSBtaW4oYWxpb3IpLFxuICB0byA9IG1heChhbGlvciksXG4gIGxlbmd0aC5vdXQgPSAxMDAwXG4pXG5cbmhpc3QoXG4gIHggPSBhbGlvcixcbiAgZnJlcSA9IEZBTFNFXG4pXG5cbmxpbmVzKFxuICB4ID0geCxcbiAgeSA9IHBkZl9hbGlvcl9nYW1tYSh4KSxcbiAgY29sID0gXCJibHVlXCIsXG4gIGx3ZCA9IDJcbilcbmBgYFxuXG48IS0tIHJuYi1zb3VyY2UtZW5kIC0tPlxuIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSBzZXEoXG4gIGZyb20gPSBtaW4oYWxpb3IpLFxuICB0byA9IG1heChhbGlvciksXG4gIGxlbmd0aC5vdXQgPSAxMDAwXG4pXG5cbmhpc3QoXG4gIHggPSBhbGlvcixcbiAgZnJlcSA9IEZBTFNFXG4pXG5cbmxpbmVzKFxuICB4ID0geCxcbiAgeSA9IHBkZl9hbGlvcl9nYW1tYSh4KSxcbiAgY29sID0gXCJibHVlXCIsXG4gIGx3ZCA9IDJcbilcbmBgYCJ9 -->
+<pre class="r"><code>x &lt;- seq(
+  from = min(alior),
+  to = max(alior),
+  length.out = 1000
+)
+
+hist(
+  x = alior,
+  freq = FALSE
+)
+
+lines(
+  x = x,
+  y = pdf_alior_gamma(x),
+  col = &quot;blue&quot;,
+  lwd = 2
+)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVZV3hwYjNKZlptbDBYM2RsYVdKMWJHeGZjbVYySUR3dElHWnBkR1JwYzNRb1lXeHBiM0pmY21WMkxDQmNJbmRsYVdKMWJHeGNJaWxjYm5OMWJXMWhjbmtvWVd4cGIzSmZabWwwWDNkbGFXSjFiR3hmY21WMktWeHVZR0JnSW4wPSAtLT5cblxuYGBgclxuYWxpb3JfZml0X3dlaWJ1bGxfcmV2IDwtIGZpdGRpc3QoYWxpb3JfcmV2LCBcIndlaWJ1bGxcIilcbnN1bW1hcnkoYWxpb3JfZml0X3dlaWJ1bGxfcmV2KVxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWxpb3JfZml0X3dlaWJ1bGxfcmV2IDwtIGZpdGRpc3QoYWxpb3JfcmV2LCBcIndlaWJ1bGxcIilcbnN1bW1hcnkoYWxpb3JfZml0X3dlaWJ1bGxfcmV2KVxuYGBgIn0= -->
+<pre class="r"><code>alior_fit_weibull_rev &lt;- fitdist(alior_rev, &quot;weibull&quot;)
+summary(alior_fit_weibull_rev)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVjR1JtWDJGc2FXOXlYM2RsYVdKMWJHd2dQQzBnWm5WdVkzUnBiMjRvZUNrZ2UxeHVJQ0JrZDJWcFluVnNiQ2hjYmlBZ0lDQjRJRDBnWVdKektHMXBiaWd0WVd4cGIzSXBLU0FySURBdU1EQXhJQzBnZUN4Y2JpQWdJQ0J6YUdGd1pTQTlJR0ZzYVc5eVgyWnBkRjkzWldsaWRXeHNYM0psZGlSbGMzUnBiV0YwWlZ0Y0luTm9ZWEJsWENKZExGeHVJQ0FnSUhOallXeGxJRDBnWVd4cGIzSmZabWwwWDNkbGFXSjFiR3hmY21WMkpHVnpkR2x0WVhSbFcxd2ljMk5oYkdWY0lsMWNiaUFnS1Z4dWZWeHVZR0JnSW4wPSAtLT5cblxuYGBgclxucGRmX2FsaW9yX3dlaWJ1bGwgPC0gZnVuY3Rpb24oeCkge1xuICBkd2VpYnVsbChcbiAgICB4ID0gYWJzKG1pbigtYWxpb3IpKSArIDAuMDAxIC0geCxcbiAgICBzaGFwZSA9IGFsaW9yX2ZpdF93ZWlidWxsX3JldiRlc3RpbWF0ZVtcInNoYXBlXCJdLFxuICAgIHNjYWxlID0gYWxpb3JfZml0X3dlaWJ1bGxfcmV2JGVzdGltYXRlW1wic2NhbGVcIl1cbiAgKVxufVxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGRmX2FsaW9yX3dlaWJ1bGwgPC0gZnVuY3Rpb24oeCkge1xuICBkd2VpYnVsbChcbiAgICB4ID0gYWJzKG1pbigtYWxpb3IpKSArIDAuMDAxIC0geCxcbiAgICBzaGFwZSA9IGFsaW9yX2ZpdF93ZWlidWxsX3JldiRlc3RpbWF0ZVtcInNoYXBlXCJdLFxuICAgIHNjYWxlID0gYWxpb3JfZml0X3dlaWJ1bGxfcmV2JGVzdGltYXRlW1wic2NhbGVcIl1cbiAgKVxufVxuYGBgIn0= -->
+<pre class="r"><code>pdf_alior_weibull &lt;- function(x) {
+  dweibull(
+    x = abs(min(-alior)) + 0.001 - x,
+    shape = alior_fit_weibull_rev$estimate[&quot;shape&quot;],
+    scale = alior_fit_weibull_rev$estimate[&quot;scale&quot;]
+  )
+}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVlQ0E4TFNCelpYRW9YRzRnSUdaeWIyMGdQU0J0YVc0b1lXeHBiM0lwTEZ4dUlDQjBieUE5SUcxaGVDaGhiR2x2Y2lrc1hHNGdJR3hsYm1kMGFDNXZkWFFnUFNBeE1EQXdYRzRwWEc1Y2JtaHBjM1FvWEc0Z0lIZ2dQU0JoYkdsdmNpeGNiaUFnWm5KbGNTQTlJRVpCVEZORlhHNHBYRzVjYm14cGJtVnpLRnh1SUNCNElEMGdlQ3hjYmlBZ2VTQTlJSEJrWmw5aGJHbHZjbDkzWldsaWRXeHNLSGdwTEZ4dUlDQmpiMndnUFNCY0ltUmhjbXRuY21WbGJsd2lMRnh1SUNCc2QyUWdQU0F5WEc0cFhHNWdZR0FpZlE9PSAtLT5cblxuYGBgclxueCA8LSBzZXEoXG4gIGZyb20gPSBtaW4oYWxpb3IpLFxuICB0byA9IG1heChhbGlvciksXG4gIGxlbmd0aC5vdXQgPSAxMDAwXG4pXG5cbmhpc3QoXG4gIHggPSBhbGlvcixcbiAgZnJlcSA9IEZBTFNFXG4pXG5cbmxpbmVzKFxuICB4ID0geCxcbiAgeSA9IHBkZl9hbGlvcl93ZWlidWxsKHgpLFxuICBjb2wgPSBcImRhcmtncmVlblwiLFxuICBsd2QgPSAyXG4pXG5gYGBcblxuPCEtLSBybmItc291cmNlLWVuZCAtLT5cbiJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueCA8LSBzZXEoXG4gIGZyb20gPSBtaW4oYWxpb3IpLFxuICB0byA9IG1heChhbGlvciksXG4gIGxlbmd0aC5vdXQgPSAxMDAwXG4pXG5cbmhpc3QoXG4gIHggPSBhbGlvcixcbiAgZnJlcSA9IEZBTFNFXG4pXG5cbmxpbmVzKFxuICB4ID0geCxcbiAgeSA9IHBkZl9hbGlvcl93ZWlidWxsKHgpLFxuICBjb2wgPSBcImRhcmtncmVlblwiLFxuICBsd2QgPSAyXG4pXG5gYGAifQ== -->
+<pre class="r"><code>x &lt;- seq(
+  from = min(alior),
+  to = max(alior),
+  length.out = 1000
+)
+
+hist(
+  x = alior,
+  freq = FALSE
+)
+
+lines(
+  x = x,
+  y = pdf_alior_weibull(x),
+  col = &quot;darkgreen&quot;,
+  lwd = 2
+)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiQ2hhcHRlciA0OiBEaXN0cmlidXRpb24gRml0dGluZyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CmRhdGEgPC0gcmVhZC5jc3YoIi4uLzAyX2RhdGFfcHJlcGFyYXRpb24vaW50X2RhdGEuY3N2IikKYGBgCgpgYGB7cn0KZGF0ZXMgPC0gYXMuRGF0ZShkYXRhJGRhdGUsIGZvcm1hdCA9ICIlWS0lbS0lZCIpCmFsaW9yIDwtIGRhdGEkY2xvc2VzX2FsaW9yCmluZyA8LSBkYXRhJGNsb3Nlc19pbmcKYGBgCgpET1BBU09XQU5JRSBST1pLxYFBRFUKCmxvZy1ub3JtYWwKZ2FtbWEKd2VpYnVsbAoKCgpgYGB7cn0KIyBpbnN0YWxsLnBhY2thZ2VzKCJmaXRkaXN0cnBsdXMiKQpsaWJyYXJ5KGZpdGRpc3RycGx1cykKYGBgCgoKCmBgYHtyfQphbGlvcl9yZXYgPC0gLWFsaW9yICsgYWJzKG1pbigtYWxpb3IpKSArIDAuMDAxCgphbGlvcl9maXRfbG5vcm1fcmV2IDwtIGZpdGRpc3QoYWxpb3JfcmV2LCAibG5vcm0iKQpzdW1tYXJ5KGFsaW9yX2ZpdF9sbm9ybV9yZXYpCmBgYAoKCmBgYHtyfQpwZGZfYWxpb3JfbG5vcm0gPC0gZnVuY3Rpb24oeCkgewogIGRsbm9ybSgKICAgIHggPSBhYnMobWluKC1hbGlvcikpICsgMC4wMDEgLSB4LAogICAgbWVhbmxvZyA9IGFsaW9yX2ZpdF9sbm9ybV9yZXYkZXN0aW1hdGVbIm1lYW5sb2ciXSwKICAgIHNkbG9nID0gYWxpb3JfZml0X2xub3JtX3JldiRlc3RpbWF0ZVsic2Rsb2ciXQogICkKfQpgYGAKCmBgYHtyfQp4IDwtIHNlcSgKICBmcm9tID0gbWluKGFsaW9yKSwKICB0byA9IG1heChhbGlvciksCiAgbGVuZ3RoLm91dCA9IDEwMDAKKQoKaGlzdCgKICB4ID0gYWxpb3IsCiAgZnJlcSA9IEZBTFNFCikKCmxpbmVzKAogIHggPSB4LAogIHkgPSBwZGZfYWxpb3JfbG5vcm0oeCksCiAgY29sID0gInJlZCIsCiAgbHdkID0gMgopCmBgYAoKYGBge3J9CmFsaW9yX2ZpdF9nYW1tYV9yZXYgPC0gZml0ZGlzdChhbGlvcl9yZXYsICJnYW1tYSIpCnN1bW1hcnkoYWxpb3JfZml0X2dhbW1hX3JldikKYGBgCgpgYGB7cn0KcGRmX2FsaW9yX2dhbW1hIDwtIGZ1bmN0aW9uKHgpIHsKICBkZ2FtbWEoCiAgICB4ID0gYWJzKG1pbigtYWxpb3IpKSArIDAuMDAxIC0geCwKICAgIHNoYXBlID0gYWxpb3JfZml0X2dhbW1hX3JldiRlc3RpbWF0ZVsic2hhcGUiXSwKICAgIHJhdGUgID0gYWxpb3JfZml0X2dhbW1hX3JldiRlc3RpbWF0ZVsicmF0ZSJdCiAgKQp9CmBgYAoKYGBge3J9CnggPC0gc2VxKAogIGZyb20gPSBtaW4oYWxpb3IpLAogIHRvID0gbWF4KGFsaW9yKSwKICBsZW5ndGgub3V0ID0gMTAwMAopCgpoaXN0KAogIHggPSBhbGlvciwKICBmcmVxID0gRkFMU0UKKQoKbGluZXMoCiAgeCA9IHgsCiAgeSA9IHBkZl9hbGlvcl9nYW1tYSh4KSwKICBjb2wgPSAiYmx1ZSIsCiAgbHdkID0gMgopCmBgYAoKYGBge3J9CmFsaW9yX2ZpdF93ZWlidWxsX3JldiA8LSBmaXRkaXN0KGFsaW9yX3JldiwgIndlaWJ1bGwiKQpzdW1tYXJ5KGFsaW9yX2ZpdF93ZWlidWxsX3JldikKYGBgCgpgYGB7cn0KcGRmX2FsaW9yX3dlaWJ1bGwgPC0gZnVuY3Rpb24oeCkgewogIGR3ZWlidWxsKAogICAgeCA9IGFicyhtaW4oLWFsaW9yKSkgKyAwLjAwMSAtIHgsCiAgICBzaGFwZSA9IGFsaW9yX2ZpdF93ZWlidWxsX3JldiRlc3RpbWF0ZVsic2hhcGUiXSwKICAgIHNjYWxlID0gYWxpb3JfZml0X3dlaWJ1bGxfcmV2JGVzdGltYXRlWyJzY2FsZSJdCiAgKQp9CmBgYAoKYGBge3J9CnggPC0gc2VxKAogIGZyb20gPSBtaW4oYWxpb3IpLAogIHRvID0gbWF4KGFsaW9yKSwKICBsZW5ndGgub3V0ID0gMTAwMAopCgpoaXN0KAogIHggPSBhbGlvciwKICBmcmVxID0gRkFMU0UKKQoKbGluZXMoCiAgeCA9IHgsCiAgeSA9IHBkZl9hbGlvcl93ZWlidWxsKHgpLAogIGNvbCA9ICJkYXJrZ3JlZW4iLAogIGx3ZCA9IDIKKQpgYGA=</div>
 
 
 
@@ -1804,7 +2003,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("01_introduction.Rmd");
+  window.initializeSourceEmbed("04_distribution_fitting.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

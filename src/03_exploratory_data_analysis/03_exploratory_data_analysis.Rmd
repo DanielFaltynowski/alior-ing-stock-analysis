@@ -1,0 +1,293 @@
+---
+title: "Chapter 3: Exploratory Data Analysis"
+output: html_notebook
+---
+
+```{r}
+data <- read.csv("../02_data_preparation/int_data.csv")
+```
+
+```{r}
+data
+```
+
+```{r}
+dates <- as.Date(data$date, format = "%Y-%m-%d")
+alior <- data$closes_alior
+ing <- data$closes_ing
+```
+
+## Time Series Visualization and Histogram – Preliminary Observations
+
+```{r}
+plot(
+  x = dates,
+  y = alior,
+  type = "l",
+  col = "maroon",
+  lwd = 2,
+  main = "Alior Bank Stock Closing Prices Over Time",
+  xlab = "Date",
+  ylab = "Closing price",
+  las = 1
+)
+grid()
+```
+
+```{r}
+hist(
+  x = alior,
+  freq = FALSE,
+  col = "maroon",
+  main = "Histogram of Alior Bank Closing Stock Prices, 2023–2024",
+  xlab = "Closing price",
+  ylab = "Density",
+  las = 1
+)
+```
+
+```{r}
+plot(
+  x = dates,
+  y = ing,
+  type = "l",
+  col = "darkorange",
+  lwd = 2,
+  main = "ING Bank Stock Closing Prices Over Time",
+  xlab = "Date",
+  ylab = "Closing price",
+  las = 1
+)
+grid()
+```
+
+```{r}
+hist(
+  x = ing,
+  freq = FALSE,
+  col = "orange",
+  main = "Histogram of ING Bank Closing Stock Prices, 2023–2024",
+  xlab = "Closing price",
+  ylab = "Density",
+  las = 1
+)
+```
+
+### General Stock Price Trends
+
+Analysis of price changes over time indicates a clear increase in Alior Bank's closing prices from the end of 2023 to the beginning of 2024. In 2023, prices rose gradually, while around the New Year there was a sharp jump. In 2024, Alior Bank prices remain relatively stable, fluctuating between 80 and 90, with drops quickly corrected by increases, indicating a maintained linear trend.
+
+For ING Bank, closing prices in 2024 remain high, but unlike Alior Bank, they show a **clear downward trend** – from around 300 in January to below 250 in December 2024. Fluctuations in ING are also much larger, ranging from 210 to 290 throughout the year, although the amplitude of fluctuations gradually decreases.
+
+### Price Distribution Symmetry
+
+The distribution of Alior Bank prices is left-skewed, meaning there is a long tail on the left side of the histogram. The highest number of observations is in the 80–90 range, corresponding to price stabilization in 2024.
+
+ING Bank's price distribution is also left-skewed, but in 2024 it shows an elongated distribution due to larger price fluctuations and the overall downward trend. Most observations are still in the 250–280 range, but in the second half of the year significantly lower values appear.
+
+### Fluctuations and Extreme Observations
+
+For Alior Bank, a noticeable price increase is seen at the end of 2023 and the beginning of 2024. After this period, prices remain relatively stable, without extreme deviations during the year.
+
+In ING, however, fluctuations in 2024 are much larger – prices vary from around 210 to 290. The scale of changes is significantly higher than for Alior Bank, and prices show a systematic decline over the year, which is clearly visible in the plot.
+
+### Preliminary Observations from the Visualizations
+
+- Alior Bank prices rose gradually in 2023, with a sharp jump around the turn of 2023/2024. In 2024, prices remain in the 80–90 range.
+
+- ING prices in 2024 remain high but show a clear downward trend – from around 300 in January to below 250 in December.
+
+- Fluctuations in ING are much larger than in Alior Bank (210–290), while Alior Bank prices remain relatively stable.
+
+- Both plots (time series and histograms) allow observing differences in price dynamics and volatility between the two companies.
+
+## Descriptive Statistics
+
+```{r}
+# install.packages("moments")
+library(moments)
+```
+
+```{r}
+cat("Alior Bank -- Descriptive Statistics\n\n")
+```
+
+```{r}
+alior_mean <- mean(
+  x = alior
+)
+
+alior_median <- median(
+  x = alior
+)
+```
+
+```{r}
+alior_range <- c(
+  min(alior),
+  max(alior)
+)
+
+alior_var <- var(
+  x = alior
+)
+
+alior_sd <- sd(
+  x = alior
+)
+```
+
+```{r}
+alior_skewness <- skewness(
+  x = alior
+)
+
+alior_kurtosis <- kurtosis(
+  x = alior
+)
+```
+
+```{r}
+alior_stats <- data.frame(
+  Statistic = c("Mean", "Median", "Min", "Max", "Variance", "SD", "Skewness", "Kurtosis"),
+  Value = c(
+    mean(alior),
+    median(alior),
+    min(alior),
+    max(alior),
+    var(alior),
+    sd(alior),
+    skewness(alior),
+    kurtosis(alior)
+  )
+)
+```
+
+```{r}
+cat("ING BANK -- DESCRIPTIVE STATISTICS", "\n")
+```
+
+```{r}
+ing_mean <- mean(
+  x = ing
+)
+
+ing_median <- median(
+  x = ing
+)
+```
+
+```{r}
+ing_range <- c(
+  min(ing),
+  max(ing)
+)
+
+ing_var <- var(
+  x = ing
+)
+
+ing_sd <- sd(
+  x = ing
+)
+```
+
+```{r}
+ing_skewness <- skewness(
+  x = ing
+)
+
+ing_kurtosis <- kurtosis(
+  x = ing
+)
+```
+
+```{r}
+alior_stats <- data.frame(
+  Mean = mean(alior),
+  Median = median(alior),
+  Min = min(alior),
+  Max = max(alior),
+  Variance = var(alior),
+  SD = sd(alior),
+  Skewness = skewness(alior),
+  Kurtosis = kurtosis(alior)
+)
+
+ing_stats <- data.frame(
+  Mean = mean(ing),
+  Median = median(ing),
+  Min = min(ing),
+  Max = max(ing),
+  Variance = var(ing),
+  SD = sd(ing),
+  Skewness = skewness(ing),
+  Kurtosis = kurtosis(ing)
+)
+```
+
+```{r}
+cat("Alior Bank -- Descriptive Statistics\n")
+print(alior_stats)
+```
+
+```{r}
+cat("\nING Bank -- Descriptive Statistics\n")
+print(ing_stats)
+```
+
+### Central Tendency
+
+In 2023–2024, **ING Bank** exhibited **significantly higher closing prices** than Alior Bank. The average closing price for ING was 214.49 PLN, while for Alior it was 67.17 PLN. In both cases, the medians were noticeably higher than the means, suggesting a distribution with a longer left tail — i.e., a greater number of lower, extreme price values.
+
+### Dispersion
+
+The range of stock prices indicates substantial differences. The highest price of Alior Bank shares was lower than the lowest price of ING shares, confirming that ING operates at a significantly higher price level. The standard deviation for ING is more than twice that of Alior, indicating a wider spread of data and higher price volatility.
+
+### Distribution Shape
+
+Negative skewness values indicate that the price distribution has a longer tail on the left side, meaning there are more extreme drops than rises. This phenomenon is consistent with the observation that the median exceeds the mean. Both kurtosis values are below 3, indicating a platykurtic distribution — flatter than normal. In practice, this means that the stock prices of both banks are relatively stable, with fewer extreme deviations.
+
+
+## Monthly Returns Analysis
+
+I conducted an analysis of the dynamics of ING Bank's stock returns using a **waterfall chart** in Excel. This analysis allows us to see in which periods the stock value increased or decreased, and the contribution of individual months or quarters to the total return over a given period.
+
+Stock returns are calculated using the standard formula:
+
+$$
+R_t = \frac{P_t - P_{t-1}}{P_{t-1}} \times 100\%
+$$
+
+where:  
+- $R_t$ – return in period $t$,  
+- $P_t$ – closing price of the stock in period $t$,  
+- $P_{t-1}$ – closing price of the stock in the previous period.
+
+Alternatively, if we want to express the return in **currency (e.g., PLN)**, we can use the formula:
+
+$$
+\Delta P_t = P_t - P_{t-1}
+$$
+
+where $\Delta P_t$ is the direct change in the stock price during the period. These values can then be used in a waterfall chart to show which periods contributed most to the increase or decrease in stock value in PLN.
+
+The chart in the file `waterfall_charts.xlsx` illustrates this dynamic, showing both positive and negative changes in stock prices over consecutive periods.
+
+
+![Alior Bank Waterfall Chart](../../screenshots/07_alior_waterfall.png)
+
+![ING Bank Waterfall Chart](../../screenshots/08_ing_waterfall.png)
+
+### Growth Dynamics
+
+From September 2023 to February 2024, Alior Bank's stock price increased by 75%, while ING's rose by 64.6%. This indicates a very strong upward trend for both companies during this period.
+
+### Seasonality and Quarterly Dynamics
+
+The waterfall chart analysis shows consistent growth in Q4 2023 and Q1 2024. For Alior Bank, prices remained stable in subsequent quarters, whereas ING experienced a noticeable decline during the same period. These observations confirm the earlier conclusions from the analysis.
+
+### Macroeconomic Context
+
+The year 2023 was challenging for the economy, with GDP growth of only 0.2%. However, from Q4 2023 onwards, there was a rebound: in Q1 2024, the economy accelerated to 2.6–2.9% thanks to improved consumption and industrial activity. At the same time, inflation decreased from over 11% in 2023 to around 4% in 2024, reaching a minimum in March, which increased consumers' real purchasing power. Stable interest rates maintained by the Monetary Policy Council throughout 2024 provided predictable financial conditions and supported the growth of bank lending activity.
+

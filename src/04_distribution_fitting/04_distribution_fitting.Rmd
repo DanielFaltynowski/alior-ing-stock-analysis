@@ -1,0 +1,137 @@
+---
+title: "Chapter 4: Distribution Fitting"
+output: html_notebook
+---
+
+```{r}
+data <- read.csv("../02_data_preparation/int_data.csv")
+```
+
+```{r}
+dates <- as.Date(data$date, format = "%Y-%m-%d")
+alior <- data$closes_alior
+ing <- data$closes_ing
+```
+
+DOPASOWANIE ROZKŁADU
+
+log-normal
+gamma
+weibull
+
+
+
+```{r}
+# install.packages("fitdistrplus")
+library(fitdistrplus)
+```
+
+
+
+```{r}
+alior_rev <- -alior + abs(min(-alior)) + 0.001
+
+alior_fit_lnorm_rev <- fitdist(alior_rev, "lnorm")
+summary(alior_fit_lnorm_rev)
+```
+
+
+```{r}
+pdf_alior_lnorm <- function(x) {
+  dlnorm(
+    x = abs(min(-alior)) + 0.001 - x,
+    meanlog = alior_fit_lnorm_rev$estimate["meanlog"],
+    sdlog = alior_fit_lnorm_rev$estimate["sdlog"]
+  )
+}
+```
+
+```{r}
+x <- seq(
+  from = min(alior),
+  to = max(alior),
+  length.out = 1000
+)
+
+hist(
+  x = alior,
+  freq = FALSE
+)
+
+lines(
+  x = x,
+  y = pdf_alior_lnorm(x),
+  col = "red",
+  lwd = 2
+)
+```
+
+```{r}
+alior_fit_gamma_rev <- fitdist(alior_rev, "gamma")
+summary(alior_fit_gamma_rev)
+```
+
+```{r}
+pdf_alior_gamma <- function(x) {
+  dgamma(
+    x = abs(min(-alior)) + 0.001 - x,
+    shape = alior_fit_gamma_rev$estimate["shape"],
+    rate  = alior_fit_gamma_rev$estimate["rate"]
+  )
+}
+```
+
+```{r}
+x <- seq(
+  from = min(alior),
+  to = max(alior),
+  length.out = 1000
+)
+
+hist(
+  x = alior,
+  freq = FALSE
+)
+
+lines(
+  x = x,
+  y = pdf_alior_gamma(x),
+  col = "blue",
+  lwd = 2
+)
+```
+
+```{r}
+alior_fit_weibull_rev <- fitdist(alior_rev, "weibull")
+summary(alior_fit_weibull_rev)
+```
+
+```{r}
+pdf_alior_weibull <- function(x) {
+  dweibull(
+    x = abs(min(-alior)) + 0.001 - x,
+    shape = alior_fit_weibull_rev$estimate["shape"],
+    scale = alior_fit_weibull_rev$estimate["scale"]
+  )
+}
+```
+
+```{r}
+x <- seq(
+  from = min(alior),
+  to = max(alior),
+  length.out = 1000
+)
+
+hist(
+  x = alior,
+  freq = FALSE
+)
+
+lines(
+  x = x,
+  y = pdf_alior_weibull(x),
+  col = "darkgreen",
+  lwd = 2
+)
+```

@@ -1,6 +1,8 @@
 ---
-title: "Chapter 3: Exploratory Data Analysis"
-output: html_notebook
+title: 'Chapter 3: Exploratory Data Analysis'
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 ```{r}

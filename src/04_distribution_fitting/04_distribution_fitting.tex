@@ -985,9 +985,11 @@ criteria}, rather than in isolation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{alior\_ks\_gamma }\OtherTok{\textless{}{-}} \FunctionTok{ks.test}\NormalTok{(alior, }\StringTok{"pgamma"}\NormalTok{,}
-                          \AttributeTok{shape =}\NormalTok{ alior\_fit\_gamma\_rev}\SpecialCharTok{$}\NormalTok{estimate[}\StringTok{"shape"}\NormalTok{],}
-                          \AttributeTok{rate  =}\NormalTok{ alior\_fit\_gamma\_rev}\SpecialCharTok{$}\NormalTok{estimate[}\StringTok{"rate"}\NormalTok{])}
+\NormalTok{alior\_ks\_gamma }\OtherTok{\textless{}{-}} \FunctionTok{ks.test}\NormalTok{(}
+\NormalTok{  alior, }\StringTok{"pgamma"}\NormalTok{,}
+  \AttributeTok{shape =}\NormalTok{ alior\_fit\_gamma\_rev}\SpecialCharTok{$}\NormalTok{estimate[}\StringTok{"shape"}\NormalTok{],}
+  \AttributeTok{rate  =}\NormalTok{ alior\_fit\_gamma\_rev}\SpecialCharTok{$}\NormalTok{estimate[}\StringTok{"rate"}\NormalTok{]}
+\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 

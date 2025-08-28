@@ -1,0 +1,81 @@
+---
+title: "Chapter 5: Linear Regression"
+output: html_notebook
+---
+
+```{r}
+data <- read.csv(
+  file = "returns.csv",
+  sep = ";"
+)
+```
+
+```{r}
+data
+```
+
+```{r}
+alior_log_returns <- data$daily_log_returns_alior[-1]
+ing_log_returns <- data$daily_log_returns_ing[-1]
+```
+
+```{r}
+plot(alior_log_returns, ing_log_returns)
+```
+
+```{r}
+# install.packages("ggplot2")
+# install.packages("ggExtra")
+library(ggplot2)
+library(ggExtra)
+```
+
+```{r}
+alior_ing <- data.frame(
+  alior_log_returns = alior_log_returns,
+  ing_log_returns = ing_log_returns
+)
+
+p <- ggplot(alior_ing, aes(x = alior_log_returns, y = ing_log_returns)) +
+  geom_point(alpha = 0.6) +
+  theme_minimal()
+
+ggMarginal(p, type = "histogram")
+```
+
+
+```{r}
+cov(alior_log_returns, ing_log_returns)
+cor(alior_log_returns, ing_log_returns)
+```
+
+
+```{r}
+model <- lm(alior_log_returns ~ ing_log_returns)
+summary(model)
+```
+
+```{r}
+plot(alior_log_returns, ing_log_returns,
+     main = "Regresja liniowa",
+     xlab = "Alior log-returns",
+     ylab = "ING log-returns",
+     pch = 19, col = "darkblue")
+
+abline(model, col = "red", lwd = 2)
+```
+
+
+```{r}
+alior_ing <- data.frame(
+  alior_log_returns = alior_log_returns,
+  ing_log_returns   = ing_log_returns
+)
+
+p <- ggplot(alior_ing, aes(x = alior_log_returns, y = ing_log_returns)) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  theme_minimal()
+
+ggMarginal(p, type = "histogram")
+```

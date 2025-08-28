@@ -13,28 +13,120 @@ alior <- data$closes_alior
 ing <- data$closes_ing
 ```
 
-DOPASOWANIE ROZKŁADU
+## Fitting a Distribution to Data
 
-log-normal
-gamma
-weibull
+One of the fundamental steps in data analysis is identifying a theoretical distribution that best describes the empirical data. This enables the subsequent application of statistical inference methods, tests, or predictive models that assume a specific distributional structure. In this chapter, several popular continuous distributions were fitted to data characterized by a right-skewed tail.
+
+### What is distribution fitting?
+
+Distribution fitting is the process of finding a theoretical distribution (e.g., normal, log-normal, gamma, Weibull) that best describes empirical data.  
+The goals are:
+- estimating the distribution parameters based on the sample,  
+- assessing the quality of the fit,  
+- selecting the best model for further analysis and inference.
+
+### Selected distributions
+
+#### a) Log-normal distribution
+If a random variable $X$ follows a normal distribution:  
+
+$$
+X \sim N(\mu, \sigma^2),
+$$
+
+then the variable $Y = e^X$ follows a log-normal distribution. The probability density function (pdf) is:
+
+$$
+f(y; \mu, \sigma) = \frac{1}{y \, \sigma \sqrt{2\pi}} \exp\left(-\frac{(\ln y - \mu)^2}{2\sigma^2}\right), \quad y > 0.
+$$
+
+**Parameters:**
+- $\mu$ – mean of the logarithms,  
+- $\sigma$ – standard deviation of the logarithms.
+
+#### b) Gamma distribution
+Probability density function:
+
+$$
+f(x; k, \theta) = \frac{1}{\Gamma(k)\theta^k} x^{k-1} e^{-x/\theta}, \quad x > 0.
+$$
+
+**Parameters:**
+- $k$ – shape parameter,  
+- $\theta$ – scale parameter.  
+$\Gamma(k)$ is the gamma function.
 
 
+#### c) Weibull distribution
+Probability density function:
+
+$$
+f(x; k, \lambda) = \frac{k}{\lambda} \left(\frac{x}{\lambda}\right)^{k-1} e^{-(x/\lambda)^k}, \quad x > 0.
+$$
+
+**Parameters:**
+- $k$ – shape parameter,  
+- $\lambda$ – scale parameter.
+
+
+### Parameter estimation – MLE
+**Maximum Likelihood Estimator (MLE)** selects such distribution parameters that maximize the likelihood function:
+
+$$
+L(\theta | x_1, \dots, x_n) = \prod_{i=1}^n f(x_i; \theta),
+$$
+
+where $\theta$ is the vector of distribution parameters.
+
+Often, the log-likelihood function is used:
+
+$$
+\ell(\theta) = \ln L(\theta | x_1, \dots, x_n) = \sum_{i=1}^n \ln f(x_i; \theta).
+$$
+
+MLE finds such $\hat{\theta}$ for which $\ell(\theta)$ reaches its maximum.
+
+---
+
+### `fitdistrplus` package
+
+The **fitdistrplus** package allows:
+- parameter estimation for many distributions (e.g., using MLE),  
+- visualization of the fit (histograms, QQ-plots, CDF),  
+- goodness-of-fit testing,  
+- model comparison using information criteria (AIC, BIC).
 
 ```{r}
 # install.packages("fitdistrplus")
 library(fitdistrplus)
 ```
 
+### Data Preparation
 
+The analyzed data were transformed so that all values are positive. To achieve this, the entire dataset was shifted by adding the value $|min(\text{x})| + 0.001$, ensuring the absence of negative values and allowing the use of distributions defined only on the positive domain (e.g., Gamma, Weibull, Log-normal).
 
 ```{r}
 alior_rev <- -alior + abs(min(-alior)) + 0.001
+```
 
+```{r}
+ing_rev <- -ing + abs(min(-ing)) + 0.001
+```
+
+### Methods
+
+Distribution fitting was performed using Maximum Likelihood Estimation (MLE). Parameters were estimated using the fitdistr function. Three distributions were fitted:
+
+- log-normal,
+- gamma,
+- Weibull.
+
+For each distribution, the parameters were estimated and theoretical curves were fitted to the histogram of the empirical data. The quality of the fit was then evaluated both visually and using statistical tests and information criteria.
+
+```{r}
 alior_fit_lnorm_rev <- fitdist(alior_rev, "lnorm")
 summary(alior_fit_lnorm_rev)
 ```
-
 
 ```{r}
 pdf_alior_lnorm <- function(x) {
@@ -44,26 +136,6 @@ pdf_alior_lnorm <- function(x) {
     sdlog = alior_fit_lnorm_rev$estimate["sdlog"]
   )
 }
-```
-
-```{r}
-x <- seq(
-  from = min(alior),
-  to = max(alior),
-  length.out = 1000
-)
-
-hist(
-  x = alior,
-  freq = FALSE
-)
-
-lines(
-  x = x,
-  y = pdf_alior_lnorm(x),
-  col = "red",
-  lwd = 2
-)
 ```
 
 ```{r}
@@ -79,26 +151,6 @@ pdf_alior_gamma <- function(x) {
     rate  = alior_fit_gamma_rev$estimate["rate"]
   )
 }
-```
-
-```{r}
-x <- seq(
-  from = min(alior),
-  to = max(alior),
-  length.out = 1000
-)
-
-hist(
-  x = alior,
-  freq = FALSE
-)
-
-lines(
-  x = x,
-  y = pdf_alior_gamma(x),
-  col = "blue",
-  lwd = 2
-)
 ```
 
 ```{r}
@@ -123,9 +175,169 @@ x <- seq(
   length.out = 1000
 )
 
+plot(
+  x = x,
+  y = pdf_alior_lnorm(x),
+  col = "red",
+  type = "l",
+  lwd = 2,
+  ylim = c(0, max(
+    pdf_alior_lnorm(x),
+    pdf_alior_gamma(x),
+    pdf_alior_weibull(x)
+  )),
+  xlab = "x",
+  ylab = "Density",
+  main = "Estimated Theoretical Distributions for Alior Bank"
+)
+
+lines(
+  x = x,
+  y = pdf_alior_gamma(x),
+  col = "blue",
+  lwd = 2
+)
+
+lines(
+  x = x,
+  y = pdf_alior_weibull(x),
+  col = "darkgreen",
+  lwd = 3
+)
+
+legend(
+  "topleft",
+  legend=c("Log-normal", "Gamma", "Weibull"),
+  col=c("red", "blue", "darkgreen"),
+  lwd=2
+)
+```
+
+```{r}
+ing_fit_lnorm_rev <- fitdist(ing_rev, "lnorm")
+summary(ing_fit_lnorm_rev)
+```
+
+```{r}
+pdf_ing_lnorm <- function(x) {
+  dlnorm(
+    x = abs(min(-ing)) + 0.001 - x,
+    meanlog = ing_fit_lnorm_rev$estimate["meanlog"],
+    sdlog   = ing_fit_lnorm_rev$estimate["sdlog"]
+  )
+}
+```
+
+```{r}
+ing_fit_gamma_rev <- fitdist(ing_rev, "gamma")
+summary(ing_fit_gamma_rev)
+```
+
+```{r}
+pdf_ing_gamma <- function(x) {
+  dgamma(
+    x = abs(min(-ing)) + 0.001 - x,
+    shape = ing_fit_gamma_rev$estimate["shape"],
+    rate  = ing_fit_gamma_rev$estimate["rate"]
+  )
+}
+```
+
+```{r}
+ing_fit_weibull_rev <- fitdist(ing_rev, "weibull")
+summary(ing_fit_weibull_rev)
+```
+
+```{r}
+pdf_ing_weibull <- function(x) {
+  dweibull(
+    x = abs(min(-ing)) + 0.001 - x,
+    shape = ing_fit_weibull_rev$estimate["shape"],
+    scale = ing_fit_weibull_rev$estimate["scale"]
+  )
+}
+```
+
+```{r}
+x <- seq(
+  from = min(ing),
+  to = max(ing),
+  length.out = 1000
+)
+
+plot(
+  x = x,
+  y = pdf_ing_lnorm(x),
+  col = "red",
+  type = "l",
+  lwd = 2,
+  ylim = c(0, max(
+    pdf_ing_lnorm(x),
+    pdf_ing_gamma(x),
+    pdf_ing_weibull(x)
+  )),
+  xlab = "x",
+  ylab = "Density",
+  main = "Estimated Theoretical Distributions for ING Bank"
+)
+
+lines(
+  x = x,
+  y = pdf_ing_gamma(x),
+  col = "blue",
+  lwd = 2
+)
+
+lines(
+  x = x,
+  y = pdf_ing_weibull(x),
+  col = "darkgreen",
+  lwd = 3
+)
+
+legend(
+  "topleft",
+  legend = c("Log-normal", "Gamma", "Weibull"),
+  col = c("red", "blue", "darkgreen"),
+  lwd = 2
+)
+
+```
+
+### Results
+
+The histogram of the data was overlaid with theoretical curves corresponding to each distribution.
+
+```{r}
+x <- seq(
+  from = min(alior),
+  to = max(alior),
+  length.out = 1000
+)
+
 hist(
   x = alior,
-  freq = FALSE
+  freq = FALSE,
+  col = "maroon",
+  main = "Histogram of Alior Bank Closing Stock Prices, 2023–2024",
+  xlab = "Closing price",
+  ylab = "Density",
+  las = 1,
+  breaks = 30
+)
+
+lines(
+  x = x,
+  y = pdf_alior_lnorm(x),
+  col = "red",
+  lwd = 2
+)
+
+lines(
+  x = x,
+  y = pdf_alior_gamma(x),
+  col = "blue",
+  lwd = 2
 )
 
 lines(
@@ -134,4 +346,249 @@ lines(
   col = "darkgreen",
   lwd = 2
 )
+
+legend(
+  "topleft",
+  legend=c("Log-normal", "Gamma", "Weibull"),
+  col=c("red", "blue", "darkgreen"),
+  lwd=2
+)
 ```
+
+```{r}
+x <- seq(
+  from = min(ing),
+  to   = max(ing),
+  length.out = 1000
+)
+
+hist(
+  x = ing,
+  freq = FALSE,
+  col = "orange",
+  main = "Histogram of ING Bank Closing Stock Prices, 2023–2024",
+  xlab = "Closing price",
+  ylab = "Density",
+  las = 1,
+  breaks = 30
+)
+
+lines(
+  x = x,
+  y = pdf_ing_lnorm(x),
+  col = "red",
+  lwd = 2
+)
+
+lines(
+  x = x,
+  y = pdf_ing_gamma(x),
+  col = "blue",
+  lwd = 2
+)
+
+lines(
+  x = x,
+  y = pdf_ing_weibull(x),
+  col = "darkgreen",
+  lwd = 2
+)
+
+legend(
+  "topleft",
+  legend = c("Log-normal", "Gamma", "Weibull"),
+  col    = c("red", "blue", "darkgreen"),
+  lwd    = 2
+)
+```
+
+Preliminary visual analysis indicates that the Log-normal distribution is the best-fitting model. Its curve follows the empirical frequency points most closely, particularly in the central part of the distribution.
+
+However, all three models show significant deviations in the left tail. The histogram indicates a higher concentration of observations in this region, which none of the tested models fully capture. This suggests that, while the overall fit is reasonable, the distributions may not completely represent the characteristics of the data, especially for extreme values.
+
+## Goodness-of-Fit Analysis
+
+Interpretation of Goodness-of-Fit Statistics
+
+To assess how well each theoretical distribution (Log-normal, Gamma, Weibull) fits the empirical data, the following test statistics were computed:
+
+- **Kolmogorov–Smirnov (KS):** measures the maximum difference between the empirical and theoretical cumulative distribution functions (CDFs).  
+  Statistic:
+
+$$
+D_n = \sup_x |F_n(x) - F(x)|,
+$$
+
+  where:
+  - $F_n(x)$ – empirical cumulative distribution function (ECDF),  
+  - $F(x)$ – theoretical cumulative distribution function (CDF).  
+  
+  The smaller the value of $D_n$, the better the fit.
+
+- **Cramér–von Mises (CM):** integrates the squared difference between empirical and theoretical CDFs.  
+  - Lower values indicate a better fit.
+
+  Statistic:
+
+$$
+W^2 = n \int_{-\infty}^{\infty} (F_n(x) - F(x))^2 \, dF(x).
+$$
+
+
+- **Anderson–Darling (AD):** a weighted version of CM, giving more weight to the tails of the distribution.  
+  Statistic:
+
+$$
+A^2 = -n - \frac{1}{n} \sum_{i=1}^n \left( (2i-1)\big[\ln F(X_{(i)}) + \ln(1 - F(X_{(n+1-i)}))\big] \right),
+$$
+
+  where $X_{(i)}$ are the ordered observations.  
+  
+  The AD test places more emphasis on the fit in the tails of the distribution compared to KS and CM.
+  
+- **Akaike’s Information Criterion (AIC):** measures the trade-off between goodness of fit and model complexity.  
+  $$
+  AIC = 2k - 2 \ln(\hat{L}),
+  $$
+  
+  where:
+  - $k$ – number of parameters,  
+  - $\hat{L}$ – maximum value of the likelihood function.  
+  
+  Lower AIC → better fit.
+
+- **Bayesian Information Criterion (BIC):** similar to AIC but penalizes model complexity more strongly, especially with larger sample sizes.  
+  $$
+  BIC = k \ln(n) - 2 \ln(\hat{L}),
+  $$
+  
+  where:
+  - $n$ – sample size.  
+  
+  Lower BIC → better fit.  
+  BIC penalizes models with more parameters more strongly than AIC.
+
+```{r}
+gofstat(
+  f = list(alior_fit_lnorm_rev, alior_fit_gamma_rev, alior_fit_weibull_rev),
+  fitnames = c("Log-normal", "Gamma", "Weibull"),
+  discrete = FALSE
+)
+```
+
+```{r}
+gofstat(
+  f = list(ing_fit_lnorm_rev, ing_fit_gamma_rev, ing_fit_weibull_rev),
+  fitnames = c("Log-normal", "Gamma", "Weibull"),
+  discrete = FALSE
+)
+```
+
+### Results and Interpretation
+
+For both datasets, Alior Bank and ING, three theoretical distributions were fitted: **Log-normal, Gamma, and Weibull**. Parameter estimation was performed using **Maximum Likelihood Estimation (MLE)**, and the quality of fit was assessed with **goodness-of-fit tests** (Kolmogorov–Smirnov, Cramér–von Mises, Anderson–Darling) as well as **information criteria** (AIC, BIC).
+
+For **Alior Bank**, the goodness-of-fit tests indicate that the **Log-normal distribution** provides the closest match to the empirical data, particularly in the central part of the distribution. KS measures the maximum deviation between the empirical and theoretical cumulative distribution functions, CM averages the squared differences, and AD gives more weight to the tails. Despite this, none of the distributions fully capture the left tail, suggesting that extreme low values are underrepresented. When considering **AIC and BIC**, which penalize model complexity while rewarding likelihood, the **Weibull distribution** emerges as the most efficient overall model. This highlights that different criteria can lead to different conclusions: Log-normal fits the data better statistically, whereas Weibull offers a better balance between fit and simplicity.
+
+For **ING**, the goodness-of-fit tests favor the **Gamma distribution**, which captures tail behavior more accurately. KS values are similar across all distributions, while CM and AD highlight Gamma as superior in describing the overall shape, including the tails. Again, none of the models perfectly represent the left tail. However, **AIC and BIC** select the **Weibull distribution** as the most balanced model, reflecting an optimal compromise between fit and parsimony.
+
+**Overall**, no single distribution perfectly describes either dataset. Goodness-of-fit tests emphasize closeness to empirical distributions, especially in tails, while information criteria highlight model efficiency and complexity. Combining these perspectives, one can conclude that **Log-normal and Gamma distributions are better for statistical fit**, whereas **Weibull provides the most balanced and parsimonious model** across both datasets. Graphical inspection of histograms and fitted curves reinforces these conclusions, particularly regarding tail behavior.
+
+## Hypothesis Testing of Distribution Fit
+
+The next step in the analysis is to formally test whether the fitted distributions provide an adequate representation of the empirical data. This is done by evaluating the **p-values** of the goodness-of-fit tests. A p-value quantifies the probability of observing a test statistic at least as extreme as the one computed from the sample, assuming the null hypothesis is true.
+
+For a **two-sided test**, the p-value is defined as:
+
+$$
+p\text{-value} = P(T \leq t_\text{obs}) + P(T \geq t_\text{obs})
+$$
+
+where $T$ is the random variable representing the test statistic under the null hypothesis, and $t_\text{obs}$ is the observed value of the statistic.
+
+In this context, the **null hypothesis ($H_0$)** states that the empirical data come from the fitted distribution. If the p-value is sufficiently high, we do not reject $H_0$, which would suggest that the distribution could plausibly describe the data.
+
+However, there are important caveats for using p-values in the context of **stock closing prices or log-returns**:
+
+- Financial data often exhibit **heavy tails, skewness, and autocorrelation**, which standard goodness-of-fit tests may not fully account for.  
+- A non-rejection of $H_0$ (high p-value) does not guarantee that the model captures all important features of the data, particularly extreme events in the tails.  
+- Conversely, very large sample sizes, as is common in financial time series, may produce extremely small p-values even for distributions that visually appear reasonable.
+
+Thus, while p-values provide a formal test of fit, they should be interpreted **together with graphical inspection and information criteria**, rather than in isolation.
+
+
+```{r}
+alior_ks_lnorm <- ks.test(alior, "plnorm",
+                   meanlog = alior_fit_lnorm_rev$estimate["meanlog"],
+                   sdlog   = alior_fit_lnorm_rev$estimate["sdlog"])
+alior_ks_lnorm
+alior_ks_lnorm$p.value < 0.05
+alior_ks_lnorm$p.value < 0.2
+```
+
+```{r}
+alior_ks_gamma <- ks.test(alior, "pgamma",
+                          shape = alior_fit_gamma_rev$estimate["shape"],
+                          rate  = alior_fit_gamma_rev$estimate["rate"])
+alior_ks_gamma
+alior_ks_gamma$p.value < 0.05
+alior_ks_gamma$p.value < 0.2
+```
+
+```{r}
+alior_ks_weibull <- ks.test(alior, "pweibull",
+                            shape = alior_fit_weibull_rev$estimate["shape"],
+                            scale = alior_fit_weibull_rev$estimate["scale"])
+alior_ks_weibull
+alior_ks_weibull$p.value < 0.05
+alior_ks_weibull$p.value < 0.2
+```
+
+```{r}
+ing_ks_lnorm <- ks.test(ing, "plnorm",
+                        meanlog = ing_fit_lnorm_rev$estimate["meanlog"],
+                        sdlog   = ing_fit_lnorm_rev$estimate["sdlog"])
+ing_ks_lnorm
+ing_ks_lnorm$p.value < 0.05 
+ing_ks_lnorm$p.value < 0.2
+```
+
+```{r}
+ing_ks_gamma <- ks.test(ing, "pgamma",
+                        shape = ing_fit_gamma_rev$estimate["shape"],
+                        rate  = ing_fit_gamma_rev$estimate["rate"])
+ing_ks_gamma
+ing_ks_gamma$p.value < 0.05
+ing_ks_gamma$p.value < 0.2
+```
+
+```{r}
+ing_ks_weibull <- ks.test(ing, "pweibull",
+                          shape = ing_fit_weibull_rev$estimate["shape"],
+                          scale = ing_fit_weibull_rev$estimate["scale"])
+ing_ks_weibull
+ing_ks_weibull$p.value < 0.05
+ing_ks_weibull$p.value < 0.2
+```
+
+| Bank       | Distribution | p-value < $5\%$ | p-value < $20\%$ |
+|------------|--------------|----------------|---------------|
+| Alior Bank | Log-normal   | TRUE           | TRUE          |
+| Alior Bank | Gamma        | TRUE           | TRUE          |
+| Alior Bank | Weibull      | TRUE           | TRUE          |
+| ING        | Log-normal   | TRUE           | TRUE          |
+| ING        | Gamma        | TRUE           | TRUE          |
+| ING        | Weibull      | TRUE           | TRUE          |
+
+
+All goodness-of-fit tests performed for both **Alior Bank** and **ING** yielded **p-values below conventional thresholds** (p < 0.05 and p < 0.2). According to these tests, the theoretical distributions differ significantly from the empirical data in every case. In other words, **none of the fitted distributions can be formally accepted as perfectly describing the observed data**.
+
+Despite this, some models appear more plausible than others when considering the relative performance across tests:
+
+- For **Alior Bank**, the **Log-normal distribution** showed the closest alignment with the empirical data, both in central values and in the tails, compared to Gamma and Weibull.  
+- For **ING**, the **Gamma distribution** was the most reasonable among the three, particularly in capturing tail behavior.
+
+Visual inspection of the histograms suggests that **both datasets might be better represented by a mixture of distributions**, reflecting the presence of extreme values and possible multiple regimes. However, modeling such mixed distributions would require a **much more extensive analysis**, including identification of component distributions and estimation of their parameters, which goes beyond the current scope.
+
+**Conclusion:** While formal tests reject all simple distributional models, Log-normal (Alior) and Gamma (ING) provide the most reasonable approximations, serving as a practical baseline for further analysis, albeit with clear limitations in the tails and extreme values.
+

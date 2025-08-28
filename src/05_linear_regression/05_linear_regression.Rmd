@@ -14,13 +14,41 @@ data <- read.csv(
 data
 ```
 
+## Returns and Log-Returns
+
+In financial analysis, **returns** and **log-returns** play a key role in measuring the relative changes in asset prices over time.
+
+### Simple Returns
+
+A **simple return** calculates the relative change in price between consecutive periods:
+
+$$
+R_t = \frac{P_t - P_{t-1}}{P_{t-1}}
+$$
+
+where $P_t$ is the price at time $t$, and $P_{t-1}$ is the price in the previous period. Simple returns are intuitive, but they **do not add up linearly over time**, which can complicate multi-period analysis.
+
+### Log-Returns
+
+A **log-return** is defined as:
+
+$$
+r_t = \ln\frac{P_t}{P_{t-1}} = \ln(P_t) - \ln(P_{t-1})
+$$
+
+The advantage of log-returns is their **additivity over time** – the log-return over multiple periods is the sum of the individual period log-returns. They are also often more suitable for modeling financial data, especially when prices grow exponentially.
+
+### Context in the Analyzed Data
+
+In the data from **09/2023–02/2024**, there was a clear upward trend in the stock prices of both companies, which often moved **in parallel**. Therefore, a natural step is to analyze **log-returns**, which better highlight relative price changes and facilitate further statistical modeling.
+
+Returns and log-returns were calculated in **Excel** and then imported into **R**, where **histograms** and a **scatter plot** comparing the log-returns of both companies were prepared. These visualizations allow for assessing the data distribution and the degree of interdependence between the companies.
+
+
+
 ```{r}
 alior_log_returns <- data$daily_log_returns_alior[-1]
 ing_log_returns <- data$daily_log_returns_ing[-1]
-```
-
-```{r}
-plot(alior_log_returns, ing_log_returns)
 ```
 
 ```{r}
@@ -37,34 +65,109 @@ alior_ing <- data.frame(
 )
 
 p <- ggplot(alior_ing, aes(x = alior_log_returns, y = ing_log_returns)) +
-  geom_point(alpha = 0.6) +
+  geom_point(alpha = 0.6, color = "darkblue") +
   theme_minimal()
 
-ggMarginal(p, type = "histogram")
+ggMarginal(
+  p,
+  type = "histogram",
+  margins = "both",
+  fill = "lightblue"
+)
 ```
+
+
+## Relationships Between Log-Returns
+
+### Covariance
+
+Covariance measures how two variables change together:
+
+$$
+\text{Cov}(X, Y) = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})
+$$
+
+- $X_i$, $Y_i$ – observations of variables X and Y  
+- $\bar{X}$, $\bar{Y}$ – arithmetic means of the variables  
+- $n$ – number of observations  
+
+A positive covariance indicates that the log-returns of Alior and ING tend to move together – when one stock rises, the other usually rises as well. A negative covariance would suggest that an increase in one stock corresponds to a decrease in the other. A value close to zero indicates little or no linear relationship. In the banking sector, positive covariance is common, as stock prices often respond similarly to macroeconomic factors and monetary policy.
+
+### Correlation
+
+Correlation normalizes covariance, resulting in a value between $[-1,1]$, which makes it easier to assess the strength of the relationship.
+
+#### Pearson Correlation (P)
+
+$$
+r_P = \frac{\text{Cov}(X, Y)}{\sigma_X \sigma_Y}
+$$
+
+Pearson correlation measures the linear relationship between Alior and ING log-returns. A value close to 1 means that changes in one stock’s log-returns are strongly associated with changes in the other in the same direction. A value close to -1 indicates a strong inverse relationship, and a value around 0 indicates little or no linear correlation. In our case, $r_P \approx 0.46$ shows a moderate positive linear relationship, meaning the stocks often move in the same direction but not perfectly in sync.
+
+#### Spearman Correlation (S)
+
+$$
+r_S = 1 - \frac{6 \sum d_i^2}{n(n^2-1)}
+$$
+
+Spearman correlation is based on the ranks of observations and measures monotonic relationships, without assuming linearity. A positive value indicates that higher log-returns of one stock generally correspond to higher log-returns of the other, even if the relationship is not strictly linear. In practice, $r_S \approx 0.43$ confirms a moderate common trend in Alior and ING log-returns, consistent with expectations for the banking sector.
+
 
 
 ```{r}
 cov(alior_log_returns, ing_log_returns)
-cor(alior_log_returns, ing_log_returns)
+cor(alior_log_returns, ing_log_returns, method = "pearson")
+cor(alior_log_returns, ing_log_returns, method = "spearman")
 ```
+
+## Analysis of Log-Return Relationships Between Alior and ING
+
+Analyzing covariance and correlation allows us to assess the extent to which the log-returns of two companies move together.
+
+- **Positive covariance** indicates that Alior and ING log-returns tend to rise together. In other words, when one stock increases, the other generally also shows an upward movement.  
+
+- **Pearson correlation ($r \approx 0.46$)** shows a moderate positive linear relationship. This means that the stocks’ log-returns generally tend to move in the same direction, although some scatter exists and the relationship is not perfectly linear.  
+
+- **Spearman correlation ($r \approx 0.43$)** measures monotonic association and indicates that higher ING log-returns are usually associated with higher Alior log-returns, even if the relationship is not exactly linear.  
+
+In summary, both linear and monotonic analyses confirm a moderate positive dependence between Alior and ING log-returns, which is consistent with expectations for companies in the same banking sector.
+
+---
+
+## Linear Regression of Alior Log-Returns on ING
+
+The purpose of linear regression is to create a model:
+
+$$
+Y = \beta_0 + \beta_1 X + \varepsilon
+$$
+
+- $\beta_0$ – intercept  
+- $\beta_1$ – slope (coefficient)  
+- $\varepsilon$ – random error  
+
+The model allows us to **describe the trend of the dependent variable $Y$ as a function of the independent variable $X$** and to predict future values.
+
+### $R^2$ (Coefficient of Determination)
+
+$$
+R^2 = 1 - \frac{\sum (Y_i - \hat{Y}_i)^2}{\sum (Y_i - \bar{Y})^2}
+$$
+
+- $\hat{Y}_i$ – predicted values from the model  
+- $\bar{Y}$ – mean of observed values  
+
+**Interpretation:**
+- $R^2 \in [0,1]$  
+- Explains the proportion of variance in the dependent variable that is accounted for by the independent variable in the model  
+- Example: $R^2 = 0.8$ means 80% of the variance in $Y$ is explained by the linear model
 
 
 ```{r}
 model <- lm(alior_log_returns ~ ing_log_returns)
 summary(model)
 ```
-
-```{r}
-plot(alior_log_returns, ing_log_returns,
-     main = "Regresja liniowa",
-     xlab = "Alior log-returns",
-     ylab = "ING log-returns",
-     pch = 19, col = "darkblue")
-
-abline(model, col = "red", lwd = 2)
-```
-
 
 ```{r}
 alior_ing <- data.frame(
@@ -79,3 +182,16 @@ p <- ggplot(alior_ing, aes(x = alior_log_returns, y = ing_log_returns)) +
 
 ggMarginal(p, type = "histogram")
 ```
+
+Linear regression analysis allows us to assess to what extent the variability of Alior log-returns can be explained by ING log-returns.
+
+- **Intercept (0.0009562)** – the average Alior log-return when ING log-return = 0. In practice, this means that if ING does not move, Alior also remains practically unchanged.  
+
+- **Slope / coefficient for ING (0.5212)** – indicates that, on average, each 1-unit increase in ING log-return is associated with a 0.5212-unit increase in Alior log-return.  
+
+- **$R^2 = 0.2151$** – the model explains about 21.5% of the variability in Alior log-returns based on ING. This represents a moderate level of fit, typical in finance where stock movements are largely random.  
+
+- $R^2 = 0.215$ also suggests that over 78% of the variance in Alior log-returns is due to other factors, such as random market fluctuations, actions of other companies, or macroeconomic factors.  
+
+In summary, the linear regression confirms a statistical relationship between the log-returns of the two companies, but it is not a strong relationship. The $R^2 = 0.215$ result is consistent with expectations for financial data.
+

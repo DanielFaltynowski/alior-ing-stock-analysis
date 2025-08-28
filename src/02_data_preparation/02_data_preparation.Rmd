@@ -1,6 +1,8 @@
 ---
-title: "Chapter 2: Data Preparation"
-output: html_notebook
+title: 'Chapter 2: Data Preparation'
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 ## Data Loading

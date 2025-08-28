@@ -1,6 +1,8 @@
 ---
-title: "Chapter 5: Linear Regression"
-output: html_notebook
+title: 'Chapter 5: Linear Regression'
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 ```{r}
@@ -61,11 +63,16 @@ library(ggExtra)
 ```{r}
 alior_ing <- data.frame(
   alior_log_returns = alior_log_returns,
-  ing_log_returns = ing_log_returns
+  ing_log_returns   = ing_log_returns
 )
 
 p <- ggplot(alior_ing, aes(x = alior_log_returns, y = ing_log_returns)) +
   geom_point(alpha = 0.6, color = "darkblue") +
+  labs(
+    title = "Alior & ING Bank Log-Returns (2023-2024) with Marginals",
+    x = "Alior Bank",
+    y = "ING Bank"
+  ) +
   theme_minimal()
 
 ggMarginal(
@@ -121,7 +128,7 @@ cor(alior_log_returns, ing_log_returns, method = "pearson")
 cor(alior_log_returns, ing_log_returns, method = "spearman")
 ```
 
-## Analysis of Log-Return Relationships Between Alior and ING
+### Analysis of Log-Return Relationships Between Alior and ING
 
 Analyzing covariance and correlation allows us to assess the extent to which the log-returns of two companies move together.
 
@@ -133,7 +140,6 @@ Analyzing covariance and correlation allows us to assess the extent to which the
 
 In summary, both linear and monotonic analyses confirm a moderate positive dependence between Alior and ING log-returns, which is consistent with expectations for companies in the same banking sector.
 
----
 
 ## Linear Regression of Alior Log-Returns on ING
 
@@ -170,17 +176,27 @@ summary(model)
 ```
 
 ```{r}
-alior_ing <- data.frame(
-  alior_log_returns = alior_log_returns,
-  ing_log_returns   = ing_log_returns
-)
+library(ggplot2)
+library(ggExtra)
+```
 
+```{r}
 p <- ggplot(alior_ing, aes(x = alior_log_returns, y = ing_log_returns)) +
-  geom_point(alpha = 0.6) +
+  geom_point(alpha = 0.6, color = "darkblue") +
   geom_smooth(method = "lm", color = "red", se = TRUE) +
+  labs(
+    title = "Alior & ING Bank Log-Returns (2023-2024) with Marginals",
+    x = "Alior Bank",
+    y = "ING Bank"
+  ) +
   theme_minimal()
 
-ggMarginal(p, type = "histogram")
+ggMarginal(
+  p,
+  type = "histogram",
+  margins = "both",
+  fill = "lightblue"
+)
 ```
 
 Linear regression analysis allows us to assess to what extent the variability of Alior log-returns can be explained by ING log-returns.

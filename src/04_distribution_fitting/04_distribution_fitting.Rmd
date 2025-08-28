@@ -1,6 +1,8 @@
 ---
-title: "Chapter 4: Distribution Fitting"
-output: html_notebook
+title: 'Chapter 4: Distribution Fitting'
+output:
+  pdf_document: default
+  html_notebook: default
 ---
 
 ```{r}
@@ -527,9 +529,12 @@ alior_ks_lnorm$p.value < 0.2
 ```
 
 ```{r}
-alior_ks_gamma <- ks.test(alior, "pgamma",
-                          shape = alior_fit_gamma_rev$estimate["shape"],
-                          rate  = alior_fit_gamma_rev$estimate["rate"])
+alior_ks_gamma <- ks.test(
+  alior, "pgamma",
+  shape = alior_fit_gamma_rev$estimate["shape"],
+  rate  = alior_fit_gamma_rev$estimate["rate"]
+)
+
 alior_ks_gamma
 alior_ks_gamma$p.value < 0.05
 alior_ks_gamma$p.value < 0.2

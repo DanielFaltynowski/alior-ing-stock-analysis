@@ -58,7 +58,7 @@ However, in all cases the *p-values* were below 5%, requiring rejection of the n
 ### Interdependence Between Banks
 
 The joint distribution of log-returns suggested a moderate relationship between the two banks. This was confirmed by regression analysis with  
-\( R^2 \approx 21.5\% \). Although there is some dependence, the relationship is too weak to conclude that one stock reliably explains the other. External factors likely play a significant role.  
+$ R^2 \approx 21.5\% $. Although there is some dependence, the relationship is too weak to conclude that one stock reliably explains the other. External factors likely play a significant role.  
 
 📊 **Visualizations**  
 - Joint distribution of log-returns with marginals and regression line  
